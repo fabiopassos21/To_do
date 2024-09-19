@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io'; // File
 import 'dart:convert';
@@ -62,8 +63,6 @@ class _homeState extends State<home> {
   }
 
   Widget criarItemLista(context, index) {
-    final item = lista[index]["titulo"];
-
     return Dismissible(
         direction: DismissDirection.endToStart,
         onDismissed: (direction) {
@@ -92,7 +91,6 @@ class _homeState extends State<home> {
         },
         background: Container(
           color: Colors.red,
-          padding: EdgeInsets.all(16),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -101,38 +99,83 @@ class _homeState extends State<home> {
           ),
         ),
         key: Key(DateTime.now().millisecondsSinceEpoch.toString()),
-        child: CheckboxListTile(
-            title: Text(lista[index]['titulo']),
-            value: lista[index]['realizada'],
-            onChanged: (valorAlterado) {
-              setState(() {
-                lista[index]['realizada'] = valorAlterado;
-              });
-              salvarArquivo();
-            }));
+        child: Column(
+          children: [
+            SizedBox(
+              height: 10,
+            ),
+            CheckboxListTile(
+                title: Text(
+                  lista[index]['titulo'],
+                  style: TextStyle(color: Colors.white),
+                ),
+                value: lista[index]['realizada'],
+                controlAffinity: ListTileControlAffinity.leading,
+                checkColor: Colors.white,
+                activeColor: Color.fromRGBO(100, 27, 141, 9),
+                tileColor: Color.fromRGBO(5, 24, 83, 9),
+                checkboxShape: BeveledRectangleBorder(),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                onChanged: (valorAlterado) {
+                  setState(() {
+                    lista[index]['realizada'] = valorAlterado;
+                    if (valorAlterado == true) {}
+                  });
+                  salvarArquivo();
+                })
+          ],
+        ));
   }
 
   @override
   Widget build(BuildContext context) {
     salvarArquivo();
-
+    DateTime agora = DateTime.now();
+    String dataFormatada = DateFormat('dd/MM/yyyy  ').format(agora);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Manipulação",
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.purple,
-        elevation: 0,
-      ),
       body: Container(
-        margin: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color.fromRGBO(31, 246, 169,
+                  1), // Corrigido o último parâmetro para opacidade entre 0 e 1
+              Color.fromRGBO(2, 179, 246, 1),
+            ],
+          ),
+        ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            Container(
+              margin: EdgeInsets.only(top: 80, left: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'Olá Bem-Vindo ',
+                        style: TextStyle(color: Colors.white, fontSize: 25),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  Text(
+                    'Atividades de hoje: ' + dataFormatada,
+                    style: TextStyle(color: Colors.white, fontSize: 15),
+                  ),
+                  SizedBox(
+                    height: 15,
+                  )
+                ],
+              ),
+            ),
             Expanded(
-              // Aqui o ListView ocupa o espaço restante
               child: ListView.builder(
                 itemCount: lista.length,
                 itemBuilder: criarItemLista,
@@ -142,9 +185,9 @@ class _homeState extends State<home> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: Colors.purple,
+        backgroundColor: Colors.blueGrey,
         foregroundColor: Colors.white,
-        elevation: 6,
+        elevation: 1,
         onPressed: () {
           showDialog(
             context: context,
