@@ -13,6 +13,7 @@ class home extends StatefulWidget {
 
 class _homeState extends State<home> {
   List lista = [];
+  Map<String, dynamic> ultimoRemovido = Map();
   TextEditingController controller = TextEditingController();
 
   salvarTarefa() {
@@ -67,11 +68,25 @@ class _homeState extends State<home> {
         direction: DismissDirection.endToStart,
         onDismissed: (direction) {
           // remover a porra do item
+          ultimoRemovido = lista[index];
           lista.removeAt(index);
           //snackbar
 
-          //  salvarArquivo();
-          final snackbar = SnackBar(content: Text("Tarefa removida !!"));
+          salvarArquivo();
+          final snackbar = SnackBar(
+            content: Text("Tarefa removida !!"),
+            duration: Duration(seconds: 5),
+            action: SnackBarAction(
+                label: "Desfazer",
+                onPressed: () {
+                  //desfazer a operacao
+                  setState(() {
+                    lista.insert(index, ultimoRemovido);
+                  });
+
+                  salvarArquivo();
+                }),
+          );
 
           ScaffoldMessenger.of(context).showSnackBar(snackbar);
         },
@@ -85,7 +100,7 @@ class _homeState extends State<home> {
             ],
           ),
         ),
-        key: Key(item),
+        key: Key(DateTime.now().millisecondsSinceEpoch.toString()),
         child: CheckboxListTile(
             title: Text(lista[index]['titulo']),
             value: lista[index]['realizada'],
